@@ -1,7 +1,10 @@
-# for insertion and deletion only minimal operation needed ( no shifting of elements)
-# time complexity for look up is O(n)
-# time complexity for insert is O(1)
-# time complexity for delete is O(1)
+# dynamic in nature, better than array
+
+# Data Structure	                            Time Complexity
+#                       Average	                                    Worst
+#                       Access	Search	Insertion	Deletion	    Access	Search	Insertion	Deletion
+# Singly-Linked List	Θ(n)	Θ(n)	Θ(1)	    Θ(1)	        O(n)	O(n)	O(1)	    O(1)
+# Doubly-Linked List	Θ(n)	Θ(n)	Θ(1)	    Θ(1)	        O(n)	O(n)	O(1)	    O(1)
 
 class Node:
     def __init__(self, data=None, next=None, prev=None):

@@ -1,3 +1,8 @@
+# Data Structure	                            Time Complexity
+#                       Average	                                    Worst
+#                       Access	Search	Insertion	Deletion	    Access	Search	Insertion	Deletion
+# Hash Table	        N/A	    Θ(1)	Θ(1)	    Θ(1)	        N/A	    O(n)	O(n)	    O(n)
+
 # hashing key for index
 # implement chaining to avoid collision on same hash
 # 1.    chaining using Separate Chaining which uses Linked List of key and value for same index
