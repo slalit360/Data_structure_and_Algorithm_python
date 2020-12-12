@@ -70,9 +70,9 @@ class BSTNode:
 
             # ( having both node)
             # approach one
-            min_val = self.right.find_min()     # find min from right sub tree
-            self.data = min_val                 # replace min with self data
-            self.right = self.right.delete_node(min_val)    # remove min from right sub tree recursively
+            min_val = self.right.find_min()  # find min from right sub tree
+            self.data = min_val  # replace min with self data
+            self.right = self.right.delete_node(min_val)  # remove min from right sub tree recursively
 
             # ( having both node)
             # approach two
@@ -131,56 +131,6 @@ class BSTNode:
             p = p.parent
         return level
 
-    def display(self):
-        lines, *_ = self._display_aux()
-        for line in lines:
-            print(line)
-
-    def _display_aux(self):
-        """Returns list of strings, width, height, and horizontal coordinate of the root."""
-        # No child.
-        if self.right is None and self.left is None:
-            line = '%s' % self.data
-            width = len(line)
-            height = 1
-            middle = width // 2
-            return [line], width, height, middle
-
-        # Only left child.
-        if self.right is None:
-            lines, n, p, x = self.left._display_aux()
-            s = '%s' % self.data
-            u = len(s)
-            first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s
-            second_line = x * ' ' + '/' + (n - x - 1 + u) * ' '
-            shifted_lines = [line + u * ' ' for line in lines]
-            return [first_line, second_line] + shifted_lines, n + u, p + 2, n + u // 2
-
-        # Only right child.
-        if self.left is None:
-            lines, n, p, x = self.right._display_aux()
-            s = '%s' % self.data
-            u = len(s)
-            first_line = s + x * '_' + (n - x) * ' '
-            second_line = (u + x) * ' ' + '\\' + (n - x - 1) * ' '
-            shifted_lines = [u * ' ' + line for line in lines]
-            return [first_line, second_line] + shifted_lines, n + u, p + 2, u // 2
-
-        # Two children.
-        left, n, p, x = self.left._display_aux()
-        right, m, q, y = self.right._display_aux()
-        s = '%s' % self.data
-        u = len(s)
-        first_line = (x + 1) * ' ' + (n - x - 1) * '_' + s + y * '_' + (m - y) * ' '
-        second_line = x * ' ' + '/' + (n - x - 1 + u + y) * ' ' + '\\' + (m - y - 1) * ' '
-        if p < q:
-            left += [n * ' '] * (q - p)
-        elif q < p:
-            right += [m * ' '] * (p - q)
-        zipped_lines = zip(left, right)
-        lines = [first_line, second_line] + [a + u * ' ' + b for a, b in zipped_lines]
-        return lines, n + m + u, max(p, q) + 2, n + u // 2
-
     def find_min(self):
         if self.left is None:
             return self.data
@@ -201,6 +151,128 @@ class BSTNode:
         if self.right:
             rs = self.right.calc_sum()
         return self.data + ls + rs
+
+    @staticmethod
+    def _build_tree_string(root, curr_index, index=False, delimiter='-'):
+        """Recursively walk down the binary tree and build a pretty-print string.
+
+        In each recursive call, a "box" of characters visually representing the
+        current (sub)tree is constructed line by line. Each line is padded with
+        whitespaces to ensure all lines in the box have the same length. Then the
+        box, its width, and start-end positions of its root node value repr string
+        (required for drawing branches) are sent up to the parent call. The parent
+        call then combines its left and right sub-boxes to build a larger box etc.
+
+        :param root: Root node of the binary tree.
+        :type root: binarytree.Node
+        :param curr_index: Level-order_ index of the current node (root node is 0).
+        :type curr_index: int
+        :param index: If set to True, include the level-order_ node indexes using
+            the following format: ``{index}{delimiter}{value}`` (default: False).
+        :type index: bool
+        :param delimiter: Delimiter character between the node index and the node
+            value (default: '-').
+        :type delimiter:
+        :return: Box of characters visually representing the current subtree, width
+            of the box, and start-end positions of the repr string of the new root
+            node value.
+        :rtype: ([str], int, int, int)
+
+        .. _Level-order:
+            https://en.wikipedia.org/wiki/Tree_traversal#Breadth-first_search
+        """
+        if root is None:
+            return [], 0, 0, 0
+
+        line1 = []
+        line2 = []
+        if index:
+            node_repr = '{}{}{}'.format(curr_index, delimiter, root.data)
+        else:
+            node_repr = str(root.data)
+
+        new_root_width = gap_size = len(node_repr)
+
+        # Get the left and right sub-boxes, their widths, and root repr positions
+        l_box, l_box_width, l_root_start, l_root_end = \
+            BSTNode._build_tree_string(root.left, 2 * curr_index + 1, index, delimiter)
+        r_box, r_box_width, r_root_start, r_root_end = \
+            BSTNode._build_tree_string(root.right, 2 * curr_index + 2, index, delimiter)
+
+        # Draw the branch connecting the current root node to the left sub-box
+        # Pad the line with whitespaces where necessary
+        if l_box_width > 0:
+            l_root = (l_root_start + l_root_end) // 2 + 1
+            line1.append(' ' * (l_root + 1))
+            line1.append('_' * (l_box_width - l_root))
+            line2.append(' ' * l_root + '/')
+            line2.append(' ' * (l_box_width - l_root))
+            new_root_start = l_box_width + 1
+            gap_size += 1
+        else:
+            new_root_start = 0
+
+        # Draw the representation of the current root node
+        line1.append(node_repr)
+        line2.append(' ' * new_root_width)
+
+        # Draw the branch connecting the current root node to the right sub-box
+        # Pad the line with whitespaces where necessary
+        if r_box_width > 0:
+            r_root = (r_root_start + r_root_end) // 2
+            line1.append('_' * r_root)
+            line1.append(' ' * (r_box_width - r_root + 1))
+            line2.append(' ' * r_root + '\\')
+            line2.append(' ' * (r_box_width - r_root))
+            gap_size += 1
+        new_root_end = new_root_start + new_root_width - 1
+
+        # Combine the left and right sub-boxes with the branches drawn above
+        gap = ' ' * gap_size
+        new_box = [''.join(line1), ''.join(line2)]
+        for i in range(max(len(l_box), len(r_box))):
+            l_line = l_box[i] if i < len(l_box) else ' ' * l_box_width
+            r_line = r_box[i] if i < len(r_box) else ' ' * r_box_width
+            new_box.append(l_line + gap + r_line)
+
+        # Return the new box, its width and its root repr positions
+        return new_box, len(new_box[0]), new_root_start, new_root_end
+
+    def __str__(self):
+        """Return the pretty-print string for the binary tree.
+
+        :return: Pretty-print string.
+        :rtype: str | unicode
+
+        **Example**:
+
+        .. doctest::
+
+            >>> from binarytree import Node
+            >>>
+            >>> root = Node(1)
+            >>> root.left = Node(2)
+            >>> root.right = Node(3)
+            >>> root.left.right = Node(4)
+            >>>
+            >>> print(root)
+            <BLANKLINE>
+              __1
+             /   \\
+            2     3
+             \\
+              4
+            <BLANKLINE>
+
+        .. note::
+            To include level-order_ indexes in the output string, use
+            :func:`binarytree.Node.pprint` instead.
+
+        .. _level-order:
+            https://en.wikipedia.org/wiki/Tree_traversal#Breadth-first_search
+        """
+        lines = BSTNode._build_tree_string(self, 0, False, '-')[0]
+        return '\n'.join((line.rstrip() for line in lines))
 
 
 def build_tree(elements):
@@ -231,6 +303,8 @@ if __name__ == '__main__':
     print("In order traversal:", numbers_tree.inorder())
     print("Pre order traversal:", numbers_tree.preorder())
     print("Post order traversal:", numbers_tree.postorder())
-    numbers_tree.display()
+    #numbers_tree.display()
+    print(numbers_tree)
     numbers_tree.delete_node(value=17)
-    numbers_tree.display()
+    #numbers_tree.display()
+    print(numbers_tree)
