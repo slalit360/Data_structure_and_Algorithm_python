@@ -10,7 +10,7 @@
   * Hash Table
   
 * Non-Linear
-  * Tree
+  * General Tree
     * Binary Search Tree
     * B Tree
     * Red - Black Tree
