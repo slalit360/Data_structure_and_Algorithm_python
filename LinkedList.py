@@ -1,3 +1,8 @@
+# for insertion and deletion only minimal operation needed ( no shifting of elements)
+# time complexity for look up is O(n)
+# time complexity for insert is O(1)
+# time complexity for delete is O(1)
+
 class Node:
     def __init__(self, data=None, next=None, prev=None):
         self.data = data
