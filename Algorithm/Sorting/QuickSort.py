@@ -5,25 +5,44 @@
 
 # Quick Sort :- O(n log(n))
 
-def partition(lists, low, high):
+def partition(array, low, high):
     i = low - 1
-    pivot = lists[high]
+    pivot = array[high]
 
     for j in range(low, high):
-        if lists[j] < pivot:
+        if array[j] < pivot:
             i += 1
-            lists[i], lists[j] = lists[j], lists[i]
+            array[i], array[j] = array[j], array[i]
 
-    lists[i+1], lists[high] = lists[high], lists[i+1]
+    array[i + 1], array[high] = array[high], array[i + 1]
     return i + 1
 
-def quick_sort(lists, low, high):
+
+def partition_1(array, low, high):
+    pi = low
+    pivot = array[pi]
+
+    while low < high:
+        while low < len(array) and array[low] <= pivot:
+            low += 1
+        while array[high] > pivot:
+            high -= 1
+        if low < high:
+            array[low], array[high] = array[high], array[low]
+
+    array[pi], array[high] = array[high], array[pi]
+
+    return high
+
+
+def quick_sort(array, low, high):
     if low < high:
-        pi = partition(lists, low, high)
-        quick_sort(lists, low, pi-1)
-        quick_sort(lists, pi+1, high)
+        pi = partition_1(array, low, high)
+        quick_sort(array, low, pi - 1)
+        quick_sort(array, pi + 1, high)
 
-lists = [5, 7, 1, 8, 3, 9, 2]
-quick_sort(lists, low=0, high=len(lists)-1)
 
-print("Quick sort : ", lists)
+array = [5, 7, 1, 8, 3, 9, 2]
+quick_sort(array, low=0, high=len(array) - 1)
+
+print("Quick sort : ", array)
